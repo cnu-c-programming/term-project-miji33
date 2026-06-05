@@ -1,37 +1,47 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "student.h"
 
 int add_stu(Student **head, int id, char *name, int score) {
-    // 인자 부족을 어떻게 아는데? 마지막 인자가 score 이니까 이게 NULL인지 판별하면 되나?
-    // 비숫자/0/음수 ID, 점수 범위 초과, 비숫자 점수 -> "Error" 포함 메시지
-    // 반복분 -> 중복 ID -> "Error: duplicate ID"
+    Student *newStudent = malloc(sizeof(Student));
+    if (newStudent == NULL) return 0;   // malloc 실패
 
-    Student newStudent = {id, name, score, NULL};
-    if (*head == NULL) {
-        *head = &newStudent;
-        return 1;
+    newStudent->id = id;
+    strncpy(newStudent->name, name, 31);
+    newStudent->score = score;
+    newStudent->next = NULL;
+    
+    Student *p = *head;
+    while(p != NULL) {
+        if (p->id == id) {
+            free(newStudent);
+            return -1;
+        }
+        p = p->next;
     }
 
-    newStudent.next = *head;
-    *head = &newStudent;
+    newStudent->next = *head;
+    *head = newStudent;
     return 1;
 }
 
 int delete_stu(Student **head, int id) {
-    // id가 비숫자/0/음수 -> "Error" 포함 메시지
-    
     if (*head == NULL) return 0;    // "Error: student not found."
 
     Student *p = *head;
 
     if (p->id == id) {
-        p->next = p->next->next;
-            return 1;   // "Student deleted."
+        *head = p->next;
+        free(p);
+        return 1;   // "Student deleted."
     }
 
-    while (p->next != NULL) {  // next의 id가 id랑 다른 동안
+    while (p->next != NULL) {
         if (p->next->id == id) {
-            p->next = p->next->next;
+            Student *q = p->next;
+            p->next = q->next;
+            free(q);
             return 1;   // "Student deleted."
         } else {
             p = p->next;
@@ -42,11 +52,8 @@ int delete_stu(Student **head, int id) {
 }
 
 int update_stu(Student **head, int id, int score) {
-    // 잘못된 점수, 점수 범위 오류 -> "Error" 포함 메시지
-    // id가 이상할 경우는 생각 안하나? 그것도 생각해야할 것 같은데
-
     Student *p = *head;
-    while (p != NULL) {  // next의 id가 id랑 다른 동안
+    while (p != NULL) {
         if (p->id == id) {
             p->score = score;
             return 1;   // "Student updated."
@@ -59,10 +66,8 @@ int update_stu(Student **head, int id, int score) {
 }
 
 Student *find_stu(Student *head, int id) {
-    // id가 비숫자/0/음수 -> "Error" 포함 메시지
-
     Student *p = head;
-    while (p != NULL) {  // next의 id가 id랑 다른 동안
+    while (p != NULL) {
         if (p->id == id) {
             return p;
         } else {
@@ -70,19 +75,55 @@ Student *find_stu(Student *head, int id) {
         }
     }
 
-    return 0;   // "Error: student not found."
+    return NULL;   // "Error: student not found."
 }
 
-// 수정할거 많음. 위에 코드 다시 수정할 것.
-
 void list_stu(Student *head) {
+    if (head == NULL) {
+        printf("No students found.");
+        return;
+    }
 
+    Student *p = head;
+    printf("ID\tName\tScore\n");
+    while(p != NULL) {
+        printf("%d\t%s\t%d\n", p->id, p->name, p->score);
+        p = p->next;
+    }
 }
 
 void stats_stu(Student *head) {
+    if (head == NULL) {
+        printf("No student data available.");
+        return;
+    }
 
+    Student *p = head;
+    int cnt = 0;
+    int sum = 0;
+    int max = 0;
+    int min = 100;
+    while(p != NULL) {
+        int score = p->score;
+        cnt++;
+        sum += score;
+        max = (score > max) ? score : max;
+        min = (score < min) ? score : min;
+        p = p->next;
+    }
+
+    printf("Count: %d\n", cnt);
+    printf("Average: %.1f\n", sum/cnt);
+    printf("max: %d\n", max);
+    printf("min: %d\n", min);
 }
 
-void exit_stu(Student *head) {
-
+void free_stu(Student *head) {
+    if (head == NULL) {
+        return;
+    } else {
+        Student *p = head->next;
+        free(head);
+        free_stu(p);
+    }
 }

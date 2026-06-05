@@ -15,4 +15,4 @@ Student *find_stu(Student *head, int id);
 void list_stu(Student *head);
 void stats_stu(Student *head);
 
-void exit_stu(Student *head);
+void free_stu(Student *head);
