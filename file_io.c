@@ -33,7 +33,7 @@ int reload(Student **head, const char *fp) {
     fgets(line, sizeof(line), f);
     if (strncmp(line, "id,name,score", 13) != 0) {
         fclose(f);
-        return -1;
+        return 0;
     }
     
     while (fscanf(f, "%d,%31s,%d\n", &id, name, &score) == 3) {

@@ -3,12 +3,16 @@
 #include "student.h"
 #include "file_io.h"
 
+extern const char *g_csv_path;
+extern int num_commands;
+extern Command commands[];
+
 typedef enum {
     SHELL_OK = 0,
     SHELL_EXIT,
     SHELL_ERR_UNKNOWN_COMMAND,
     SHELL_ERR_INVALID_ARGUMENT,
-    SHELL_ERR_MISSING_ARGUMENT,
+    SHELL_ERR_MEMORY,
     SHELL_ERR_FILE_OPEN,
     SHELL_ERR_FILE_WRITE,
     SHELL_ERR_STUDENT_NOT_FOUND,
