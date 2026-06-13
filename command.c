@@ -18,7 +18,7 @@ Command commands[] = {
     {"clear", handle_clear, "clear", "Clear screen"},
     {"exit", handle_exit, "exit", "Exit shell"}
 };
-num_commands = sizeof(commands) / sizeof(commands[0]);
+int num_commands = sizeof(commands) / sizeof(commands[0]);
 #endif
 
 #ifdef CLIENT_MODE
@@ -31,10 +31,11 @@ Command commands[] = {
     {"clear", handle_clear, "clear", "Clear screen"},
     {"exit", handle_exit, "exit", "Exit shell"}
 };
-num_commands = sizeof(commands) / sizeof(commands[0]);
+int num_commands = sizeof(commands) / sizeof(commands[0]);
 #endif
 
 ShellResult handle_save(char* args, Student **head) {
+    (void)args;
     int result = save(*head, g_csv_path);
 
     if (result == -1) {
@@ -186,6 +187,8 @@ ShellResult handle_stats(char* args, Student **head) {
 }
 
 ShellResult handle_help(char* args, Student **head) {
+    (void)args;
+    (void)head;
     printf("Commands:\n");
     for (int i = 0; i < num_commands; i++) {
         printf("%-30s%s\n", commands[i].usage, commands[i].description);
@@ -200,7 +203,7 @@ ShellResult handle_clear(char* args, Student **head) {
 
 ShellResult handle_exit(char* args, Student **head) {
     free_stu(*head);
-    *head == NULL;
+    *head = NULL;
     printf("Goodbye.\n");
     return SHELL_EXIT;
 }

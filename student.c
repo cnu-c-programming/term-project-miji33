@@ -21,8 +21,13 @@ int add_stu(Student **head, int id, char *name, int score) {
         p = p->next;
     }
 
-    newStudent->next = *head;
-    *head = newStudent;
+    if (*head == NULL) {
+        *head = newStudent;
+    } else {
+        Student *p = *head;
+        while (p->next != NULL) p = p->next;
+        p->next = newStudent;
+    }
     return 1;
 }
 

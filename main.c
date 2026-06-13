@@ -19,9 +19,9 @@
 #include <string.h>
 
 /* TODO: Add your own header includes here */
-/* #include "student.h"  */
-/* #include "file_io.h"  */
-/* #include "command.h"  */
+#include "student.h"
+#include "file_io.h"
+#include "command.h"
 
 /* ---------------------------------------------------------------
  * TODO: Implement the interactive shell loop.
@@ -31,8 +31,49 @@
  *   - Loop until the user types "exit" or EOF.
  * --------------------------------------------------------------- */
 void run_shell(const char *csv_path) {
-    /* TODO */
-    (void)csv_path;
+    g_csv_path = csv_path;
+    Student *head = NULL;
+    int cnt = reload(&head, csv_path);
+    
+    #ifdef ADMIN_MODE
+    printf("[Admin Program]\n");
+    #endif
+    #ifdef CLIENT_MODE
+    printf("[Client Program]\n");
+    #endif
+
+    printf("Loaded %d students from %s.\n", cnt, csv_path);
+    
+    char line[256];
+    while (1) {
+        #ifdef ADMIN_MODE
+        printf("admin> ");
+        #endif
+        #ifdef CLIENT_MODE
+        printf("client> ");
+        #endif
+        
+        if (fgets(line, sizeof(line), stdin) == NULL) break;
+
+        line[strcspn(line, "\n")] = '\0';
+
+        char *cmd = strtok(line, " ");
+        if (cmd == NULL) continue;
+        char *args = strtok(NULL, "");
+
+        int found = 0;
+        ShellResult result = SHELL_OK;
+        for (int i = 0; i < num_commands; i++) {
+            if (strcmp(commands[i].name, cmd) == 0) {
+                result = commands[i].handler(args, &head);
+                found = 1;
+                break;
+            }
+        }
+        if (!found) printf("Unknown command or permission denied.\n");
+
+        if (result == SHELL_EXIT) { break; }   
+    }
 }
 
 /* ---------------------------------------------------------------
@@ -42,32 +83,75 @@ void run_shell(const char *csv_path) {
  *   - Close the file when done.
  * --------------------------------------------------------------- */
 void run_command_file(const char *cmd_file, const char *csv_path) {
-    /* TODO */
-    (void)cmd_file;
-    (void)csv_path;
+    g_csv_path = csv_path;
+    Student *head = NULL;
+    int cnt = reload(&head, csv_path);
+    
+    #ifdef ADMIN_MODE
+    printf("[Admin Program]\n");
+    #endif
+    #ifdef CLIENT_MODE
+    printf("[Client Program]\n");
+    #endif
+
+    printf("Loaded %d students from %s.\n", cnt, csv_path);
+    
+    FILE *f = fopen(cmd_file, "r");
+    if (f == NULL) {
+        printf("Error: cannot open command file.\n");
+        return;
+    }
+
+    char line[256];
+    int line_num = 1;
+    while (1) {
+        if (fgets(line, sizeof(line), f) == NULL) break;
+        
+        line[strcspn(line, "\n")] = '\0';
+        if (line[0] == '\0' || line[0] == '#') continue;
+        printf("[command file:%d] %s\n", line_num++, line);
+        
+        char *cmd = strtok(line, " ");
+        if (cmd == NULL) continue;
+        char *args = strtok(NULL, "");
+
+        int found = 0;
+        ShellResult result = SHELL_OK;
+        for (int i = 0; i < num_commands; i++) {
+            if (strcmp(commands[i].name, cmd) == 0) {
+                result = commands[i].handler(args, &head);
+                found = 1;
+                break;
+            }
+        }
+        if (!found) printf("Unknown command or permission denied.\n");
+
+        if (result == SHELL_EXIT) { break; }
+    }
+    fclose(f);
 }
 
 int main(int argc, char *argv[]) {
     const char *csv_path  = "students.csv"; /* default CSV file */
     const char *cmd_file  = NULL;           /* -f <file> argument */
 
-    /* TODO: Parse command-line arguments.
-     *   Supported flags:
-     *     -f <file>   run commands from <file> instead of stdin
-     *   Remaining positional argument (if any): path to students CSV.
-     *
-     *   Example parsing skeleton:
-     *
-     *   for (int i = 1; i < argc; i++) {
-     *       if (strcmp(argv[i], "-f") == 0 && i + 1 < argc) {
-     *           cmd_file = argv[++i];
-     *       } else {
-     *           csv_path = argv[i];
-     *       }
-     *   }
-     */
-    (void)argc;
-    (void)argv;
+    if (argc < 2) {
+    #ifdef ADMIN_MODE
+        printf("Usage: ./admin_shell <csv_file> [-f command_file]\n");
+    #endif
+    #ifdef CLIENT_MODE
+        printf("Usage: ./client_shell <csv_file> [-f command_file]\n");
+    #endif
+        return 1;
+    }
+
+    for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "-f") == 0 && i + 1 < argc) {
+                cmd_file = argv[++i];
+            } else {
+                csv_path = argv[i];
+            }
+        }
 
 #ifdef ADMIN_MODE
     /* Admin shell: supports add, delete, update, save, load, sort, list, find, help, exit */

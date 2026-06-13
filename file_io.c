@@ -31,12 +31,13 @@ int reload(Student **head, const char *fp) {
 
     char line[128];
     fgets(line, sizeof(line), f);
+    line[strcspn(line, "\n")] = '\0';
     if (strncmp(line, "id,name,score", 13) != 0) {
         fclose(f);
         return 0;
     }
     
-    while (fscanf(f, "%d,%31s,%d\n", &id, name, &score) == 3) {
+    while (fscanf(f, "%d,%31[^,],%d", &id, name, &score) == 3) {
         add_stu(head, id, name, score);
         cnt++;
     }

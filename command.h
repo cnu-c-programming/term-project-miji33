@@ -3,9 +3,6 @@
 #include "student.h"
 #include "file_io.h"
 
-extern const char *g_csv_path;
-extern int num_commands;
-extern Command commands[];
 
 typedef enum {
     SHELL_OK = 0,
@@ -28,6 +25,10 @@ typedef struct {
     const char *usage;
     const char *description;
 } Command;
+
+extern const char *g_csv_path;
+extern int num_commands;
+extern Command commands[];
 
 ShellResult handle_save(char* args, Student **head);
 ShellResult handle_reload(char* args, Student **head);
