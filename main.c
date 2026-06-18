@@ -124,8 +124,14 @@ void run_command_file(const char *cmd_file, const char *csv_path) {
                 break;
             }
         }
-        if (!found) printf("Unknown command or permission denied.\n");
-
+        
+        if (!found) {
+            printf("Unknown command or permission denied.\n");
+            printf("Skipped line %d.\n", line_num - 1);
+        } else if (result != SHELL_OK && result != SHELL_EXIT) {
+            printf("Skipped line %d.\n", line_num - 1);
+        }
+        
         if (result == SHELL_EXIT) { break; }
     }
     fclose(f);

@@ -119,8 +119,8 @@ void stats_stu(Student *head) {
 
     printf("Count: %d\n", cnt);
     printf("Average: %.1f\n", (float)sum/cnt);
-    printf("max: %d\n", max);
-    printf("min: %d\n", min);
+    printf("Max: %d\n", max);
+    printf("Min: %d\n", min);
 }
 
 void free_stu(Student *head) {

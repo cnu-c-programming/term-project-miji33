@@ -29,16 +29,17 @@ make clean    # 빌드 파일 삭제
 
 | 명령어 | Admin | Client | 설명 |
 |--------|-------|--------|------|
-| `list` | O | O | 전체 학생 목록 출력 |
-| `find <id>` | O | O | ID로 학생 검색 |
-| `sort <name\|score>` | O | O | 이름 또는 점수로 정렬 |
-| `help` | O | O | 명령어 도움말 |
-| `exit` | O | O | 프로그램 종료 |
-| `reload` | O | O | CSV에서 다시 불러오기 |
 | `save` | O | X | CSV에 저장 |
+| `reload` | O | O | CSV에서 다시 불러오기 |
 | `add <id> <name> <score>` | O | X | 학생 추가 |
 | `delete <id>` | O | X | 학생 삭제 |
 | `update <id> <score>` | O | X | 점수 수정 |
+| `find <id>` | O | O | ID로 학생 검색 |
+| `list` | O | O | 전체 학생 목록 출력 |
+| `stats` | O | O | 학생 수, 평균, 최고점, 최저점 출력 |
+| `help` | O | O | 명령어 도움말 |
+| `clear` | O | O | 화면 지우기 |
+| `exit` | O | O | 프로그램 종료 |
 
 ## CSV 형식
 
@@ -57,6 +58,7 @@ id,name,score
 
 - 한 줄에 하나의 명령어
 - `#`으로 시작하는 줄은 주석으로 무시
+- 빈 줄도 무시
 - 명령어 실행 시 `[command file:N]` 형태로 줄 번호 출력
 - 오류 발생 시 해당 줄 건너뛰고 다음 명령어 계속 실행
 
@@ -74,26 +76,16 @@ exit
 
 ```
 student/
-├── main.c       - 프로그램 진입점 (구현 필요)
+├── main.c       - 프로그램 시작, 인자처리, main loop
+├── student.h    - Student 구조체와 linked ist 함수 선언
+├── student.c    - linked list 구현
+├── file_io.h    - CSV load/save 함수 선언
+├── file_io.c    - CSV 파일 입출력 구현
+├── command.h    - command 타입, command table, handler 선언
+├── command.c    - 명령어 파싱과 command handler 구현
+├── students.csv - 샘플 CSV 파일
 ├── Makefile     - 빌드 자동화
 ├── grader.py    - 제출 전 기능 확인용 채점 스크립트
 ├── grader.md    - grader 사용법
 └── expected/    - 채점 기준 CSV 파일 모음
 ```
-
-> 자세한 과제 명세는 배포된 `term_project_description.docx` 를 참고하세요.
-
-## 제출 전 기능 확인
-
-```bash
-# Linux / macOS
-python3 grader.py ./admin_shell ./client_shell students.csv
-
-# Windows (CMD)
-grader.bat admin_shell.exe client_shell.exe students.csv
-
-# Windows (PowerShell)
-.\grader.ps1 admin_shell.exe client_shell.exe students.csv
-```
-
-> 최종 채점에 사용하는 test case는 변경될 수 있습니다.
