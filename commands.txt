@@ -1,0 +1,14 @@
+list
+
+add 4 David 88
+add -1 Emma 72
+
+update 99 70
+
+find 4
+
+stats
+
+save
+
+exit
